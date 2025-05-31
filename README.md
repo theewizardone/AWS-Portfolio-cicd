@@ -5,87 +5,108 @@ This repository contains the CI/CD pipeline for deploying a static AWS portfolio
 
 ![image](https://github.com/user-attachments/assets/4c26a75b-e11f-4047-a414-f658c349467d)
 
-🚧 Prerequisites:
-AWS Account
+🚀 Tech Stack
+HTML/CSS/JS – Portfolio Website
 
-S3 Bucket (for hosting your portfolio)
+AWS S3 – Static Website Hosting
 
-IAM User or Role with S3 access
+IAM – Secure Role-based Access
 
-GitHub Repository with your portfolio code (HTML/CSS/JS)
+GitHub – Source Code Hosting
 
-GitHub Actions enabled
+GitHub Actions – CI/CD Pipeline
 
-🔧 Step-by-Step Instructions:
-Step 1: Create and Configure S3 Bucket
-Go to AWS Console → S3 → Create bucket
+🧱 Architecture Overview
+Developer pushes changes to GitHub.
 
-Bucket settings:
+GitHub Actions triggers a CI workflow.
 
-Name it uniquely (e.g., my-portfolio-site)
+The workflow deploys the latest code to an S3 bucket using IAM credentials.
 
-Enable Static Website Hosting in the "Properties" tab
+The site is instantly available live via AWS S3.
 
-Set index document to index.html
+📁 Folder Structure
+bash
+Copy
+Edit
+root/
+├── website/                # Portfolio source files
+│   ├── index.html
+│   ├── style.css
+│   └── ...
+└── .github/
+    └── workflows/
+        └── deploy.yml      # GitHub Actions workflow
+🛠️ Setup Instructions
+1. Clone and Prepare Repository
+bash
+Copy
+Edit
+git clone https://github.com/your-username/aws-portfolio-cicd.git
+cd aws-portfolio-cicd
+Place your portfolio code inside the website/ directory.
 
-Set permissions:
+2. Create and Configure S3 Bucket
+Go to AWS Console → S3 → Create Bucket
 
-Make bucket public (if needed) by editing the bucket policy:
+Enable Static Website Hosting under Properties
+
+Set:
+
+Index document: index.html
+
+Make the bucket public using a bucket policy:
 
 json
-
+Copy
+Edit
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "PublicReadGetObject",
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::my-portfolio-site/*"
+      "Resource": "arn:aws:s3:::your-bucket-name/*"
     }
   ]
 }
-Step 2: Set Up IAM Credentials
-Go to IAM → Users → Add user
+3. Set Up IAM Role
+Create an IAM user with programmatic access
 
-Add programmatic access (access key ID and secret)
-
-Attach policy:
+Attach this inline policy:
 
 json
-
+Copy
+Edit
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": ["s3:*"],
-      "Resource": ["arn:aws:s3:::my-portfolio-site", "arn:aws:s3:::my-portfolio-site/*"]
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name",
+        "arn:aws:s3:::your-bucket-name/*"
+      ]
     }
   ]
 }
-Save AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
+4. Add GitHub Secrets
+Go to your repo → Settings → Secrets → Actions and add:
 
-Step 3: Create GitHub Repo
-Create a new repository (e.g., AWS-Portfolio-cicd)
+Secret Name	Value
+AWS_ACCESS_KEY_ID	From IAM user
+AWS_SECRET_ACCESS_KEY	From IAM user
+AWS_REGION	e.g., us-east-1
+AWS_S3_BUCKET	Your bucket name
 
-Push your portfolio files to it (HTML, CSS, JS, images)
-
-Step 4: Add Secrets to GitHub
-Go to Settings → Secrets → Actions and add:
-
-Name	Value
-AWS_ACCESS_KEY_ID	Your AWS access key
-AWS_SECRET_ACCESS_KEY	Your AWS secret key
-AWS_REGION	Your bucket's region (e.g., us-east-1)
-AWS_S3_BUCKET	Name of the bucket (e.g., my-portfolio-site)
-
-Step 5: Set Up GitHub Actions Workflow
+5. Configure GitHub Actions Workflow
 Create .github/workflows/deploy.yml:
 
 yaml
-
+Copy
+Edit
 name: Deploy to S3
 
 on:
@@ -110,19 +131,27 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
         SOURCE_DIR: "website"
-Make sure your portfolio files are in a website/ directory.
+6. Deploy 🚀
+Push changes to the main branch:
 
-Step 6: Push Changes and Deploy
-Push changes to the main branch
+bash
+Copy
+Edit
+git add .
+git commit -m "Deploy portfolio"
+git push origin main
+GitHub Actions will automatically deploy your site to S3.
 
-GitHub Actions will:
-
-Run the workflow
-
-Deploy your site to the S3 bucket
-
-✅ Bonus: Access Your Portfolio
+🌐 Access Your Site
 Visit:
 
-php-template
-http://<your-bucket-name>.s3-website-<region>.amazonaws.com
+arduino
+Copy
+Edit
+http://your-bucket-name.s3-website-your-region.amazonaws.com
+Example:
+
+arduino
+Copy
+Edit
+http://my-portfolio-site.s3-website-us-east-1.amazonaws.com
